@@ -36,8 +36,43 @@
   const speakButton = document.querySelector('#speak');
   const stopButton = document.querySelector('#stop');
 
-  //Your code goes here
+  // Fetch available voices and populate the dropdown
+  function populateVoices() {
+    voices = speechSynthesis.getVoices();
+
+    voicesDropdown.innerHTML = voices
+      .map(voice => `<option value="${voice.name}">${voice.name} (${voice.lang})</option>`)
+      .join('');
+  }
+
+  // Wait for the voices to be loaded before populating the dropdown
+  speechSynthesis.addEventListener('voiceschanged', populateVoices);
+  populateVoices(); // In case voices are already loaded
+
+  // Function to start speaking
+  function speak() {
+    if (speechSynthesis.speaking) {
+      console.error('SpeechSynthesis.speaking');
+      return;
+    }
+    msg.text = document.querySelector('[name="text"]').value;
+    const selectedVoice = voices.find(voice => voice.name === voicesDropdown.value);
+    msg.voice = selectedVoice;
+    msg.rate = parseFloat(document.querySelector('[name="rate"]').value);
+    msg.pitch = parseFloat(document.querySelector('[name="pitch"]').value);
+    speechSynthesis.speak(msg);
+  }
+
+  // Function to stop speaking
+  function stop() {
+    speechSynthesis.cancel();
+  }
+
+  // Event listeners
+  speakButton.addEventListener('click', speak);
+  stopButton.addEventListener('click', stop);
 </script>
+
 
 </body>
 </html>
